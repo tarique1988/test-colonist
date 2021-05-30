@@ -47,6 +47,8 @@
         y: this.centerY - this.ballSide / 2,
         width: this.ballSide,
         height: this.ballSide,
+        dx: 5,
+        dy: 5,
         color: '#FF5733'
       })
 
@@ -58,14 +60,35 @@
       this.canvas.width = this.width
       this.canvas.height = this.height
 
-      if (this.playerLeft) this.playerLeft.y += this.playerLeft.dy
-      else console.log(`Loading player 1.`);
+      // If the playerLeft and playerRight variables are defined, proceed!
+      if (this.playerLeft && this.playerRight) {
+        this.playerLeft.y += this.playerLeft.dy
+        this.playerRight.y += this.playerRight.dy
+      } else console.log(`Loading...`);
 
-      if (this.playerRight) this.playerRight.y += this.playerRight.dy
-      else console.log(`Loading player 2`);
-
-
+      // if the ball variable is defined, proceed!
+      if (this.ball) {
+        this.ball.x += this.ball.dx
+        this.ball.y += this.ball.dy
+        this.handleBallCollision()
+      }
     };
+
+    // Detect and handle collision
+    app.handleBallCollision = function () {
+      if ((this.ball.x + this.ballSide >= this.playerRight.x
+        && this.ball.x + this.ballSide <= this.playerRight.x + this.playerWidth
+        && this.ball.y + this.ballSide >= this.playerRight.y
+        && this.ball.y <= this.playerRight.y + this.playerHeight) ||
+        (this.ball.x <= this.playerLeft.x + this.playerWidth
+          && this.ball.x >= this.playerLeft.x
+          && this.ball.y + this.ballSide >= this.playerLeft.y
+          && this.ball.y <= this.playerLeft.y + this.playerHeight)) {
+        this.ball.dx *= -1
+      }
+
+      if (this.ball.y + this.ballSide >= this.height || this.ball.y <= 0) this.ball.dy *= -1
+    }
 
     // Calculate and save values for positions, bounds, width, height, and side
     app.calculateBounds = function () {
