@@ -62,8 +62,7 @@
 
       // If the playerLeft and playerRight variables are defined, proceed!
       if (this.playerLeft && this.playerRight) {
-        this.playerLeft.y += this.playerLeft.dy
-        this.playerRight.y += this.playerRight.dy
+        this.handlePlayersMovement()
       } else console.log(`Loading...`);
 
       // if the ball variable is defined, proceed!
@@ -73,6 +72,18 @@
         this.handleBallCollision()
       }
     };
+
+    // Make sure that players only move within the defined boundaries
+    app.handlePlayersMovement = function () {
+      const playerRightNewY = this.playerRight.y + this.playerRight.dy
+      const playerLeftNewY = this.playerLeft.y + this.playerLeft.dy
+      if (playerRightNewY > this.topBound && playerRightNewY < this.bottomBound) {
+        this.playerRight.y = playerRightNewY;
+      }
+      if (playerLeftNewY > this.topBound && playerLeftNewY < this.bottomBound) {
+        this.playerLeft.y = playerLeftNewY
+      }
+    }
 
     // Detect and handle collision
     app.handleBallCollision = function () {
