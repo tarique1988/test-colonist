@@ -5,14 +5,45 @@
 	<title>Ping Pong Game</title>
 </head>
 
-<body>
+<body style="padding: 0; margin: 0; height: 100vh;">
 	<canvas id="canvas" width="800" height="400"></canvas>
 	<script type="text/javascript" src="js/app.js"></script>
 	<script type="text/javascript">
 
-		app.onInit = function () { };
+		app.onInit = function () {
+			this.calculateBounds()
+		};
 
-		app.onUpdate = function (time) { };
+		app.onUpdate = function (time) {
+			// TODO#1: Make the game cover the whole browser
+			this.canvas.width = this.width
+			this.canvas.height = this.height
+		};
+
+		// Calculate and save values for positions, bounds, width, height, and side
+		app.calculateBounds = function () {
+			// Save the existing width and height
+			this.previousWidth = this.width
+			this.previousHeight = this.height
+
+			// update the width and height to match the window
+			this.width = window.innerWidth
+			this.height = window.innerHeight
+
+			// calculate the position for center and boundary
+			this.centerX = this.width / 2
+			this.centerY = this.height / 2
+			this.rightBound = this.width - this.playerWidth * 2
+			this.leftBound = this.playerWidth * 2
+			this.topBound = 0
+			this.bottomBound = this.height - this.playerHeight
+
+			// Calculate the measurements of player and ball
+			this.playerWidth = this.width / 80
+			this.playerHeight = this.height / 5
+			this.ballSide = this.width / 100
+
+		}
 	</script>
 </body>
 
