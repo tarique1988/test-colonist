@@ -25,7 +25,8 @@
         width: this.playerWidth,
         height: this.playerHeight,
         dy: 0,
-        color: '#581845'
+        color: '#581845',
+        score: 0
       });
 
       this.playerLeft = this.getNode("player-left")
@@ -39,6 +40,7 @@
         height: this.playerHeight,
         dy: 0,
         color: '#581845',
+        score: 0
       });
 
       this.playerRight = this.getNode("player-right")
@@ -70,6 +72,7 @@
       }
       // If the playerLeft and playerRight variables are defined, proceed!
       if (this.playerLeft && this.playerRight) {
+        this.showScoreboard()
         this.handlePlayersMovement()
       } else console.log(`Loading...`);
 
@@ -81,6 +84,11 @@
         this.checkForWinner()
       }
     };
+
+    app.showScoreboard = function () {
+      this.drawText(`PlayerLeft: ${this.playerLeft.score}`, this.leftBound, 50, "start")
+      this.drawText(`PlayerRight: ${this.playerRight.score}`, this.rightBound, 50, "end")
+    }
 
     // Make sure that players only move within the defined boundaries
     app.handlePlayersMovement = function () {
@@ -99,10 +107,12 @@
       // Check if the ball crosses at least 50% of any one of the player's width
       if (this.ball.x < this.playerLeft.x + this.playerLeft.width / 2) {
         console.log(`Player 2 scored`)
-        app.reset()
+        this.playerRight.score += 10
+        app.resetBall()
       } else if (this.ball.x + this.ballSide > this.playerRight.x + this.playerRight.width / 2) {
         console.log(`Player 1 scored`)
-        app.reset()
+        this.playerLeft.score += 10
+        app.resetBall()
       }
     }
 
@@ -110,7 +120,6 @@
     app.reset = function () {
       this.resetPlayers()
       this.resetBall()
-      this.isStarted = false
     }
 
     // Reset the players
@@ -184,6 +193,7 @@
     app.drawText = function (msg, posX, posY, alignment = "center", font = "bold 24px Arial") {
       this.context.font = font
       this.context.textAlign = alignment
+      this.context.fillStyle = "#900C3F"
       this.context.fillText(msg, posX, posY)
     }
 
