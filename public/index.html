@@ -121,26 +121,28 @@
     app.reset = function () {
       this.resetPlayers()
       this.resetBall()
-      this.gameSpeed = 5
     }
 
     // Reset the players
     app.resetPlayers = function () {
       this.playerRight.x = this.rightBound
       this.playerRight.y = this.centerY - this.playerHeight / 2
+      this.playerRight.dy = this.gameSpeed
       this.playerRight.score = 0
 
       this.playerLeft.x = this.leftBound
       this.playerLeft.y = this.centerY - this.playerHeight / 2
+      this.playerLeft.dy = this.gameSpeed
       this.playerLeft.score = 0
     }
 
     // Reset the ball
     app.resetBall = function () {
+      this.gameSpeed = 5
       this.ball.x = this.centerX - this.ballSide / 2
       this.ball.y = this.centerY - this.ballSide / 2
-      this.ball.dx = 5
-      this.ball.dy = 5
+      this.ball.dx = this.gameSpeed
+      this.ball.dy = this.gameSpeed
 
       // Randomize the direction of movement for the ball
       const random = Math.floor((Math.random() * 3) + 1)
