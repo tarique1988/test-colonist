@@ -13,6 +13,7 @@
     app.onInit = function () {
       // Set the game's started state to false 
       this.isStarted = false
+      this.gameSpeed = 5
 
       // Calculate the initial bounds, widths, heights, and positions
       this.calculateBounds()
@@ -52,8 +53,8 @@
         y: this.centerY - this.ballSide / 2,
         width: this.ballSide,
         height: this.ballSide,
-        dx: 5,
-        dy: 5,
+        dx: this.gameSpeed,
+        dy: this.gameSpeed,
         color: '#FF5733'
       })
 
@@ -120,6 +121,7 @@
     app.reset = function () {
       this.resetPlayers()
       this.resetBall()
+      this.gameSpeed = 5
     }
 
     // Reset the players
@@ -159,10 +161,15 @@
           && this.ball.x >= this.playerLeft.x
           && this.ball.y + this.ballSide >= this.playerLeft.y
           && this.ball.y <= this.playerLeft.y + this.playerHeight)) {
-        this.ball.dx *= -1
+        this.gameSpeed *= 1.05 // increase the speed by 5% each time
+        if (this.ball.dx < 0) this.ball.dx = this.gameSpeed
+        else this.ball.dx = -this.gameSpeed
       }
 
-      if (this.ball.y + this.ballSide >= this.height || this.ball.y <= 0) this.ball.dy *= -1
+      if (this.ball.y + this.ballSide >= this.height || this.ball.y <= 0) {
+        if (this.ball.dy < 0) this.ball.dy = this.gameSpeed
+        else this.ball.dy = -this.gameSpeed
+      }
     }
 
     // Calculate and save values for positions, bounds, width, height, and side
@@ -200,25 +207,43 @@
     // Handle the key press event
     function keyDownHandler(e) {
       if (e.keyCode == 38 || e.which == 38) {
-        app.playerRight.dy = -5
+        app.playerRight.dy = -app.gameSpeed
       }
       if (e.keyCode == 40 || e.which == 40)
-        app.playerRight.dy = 5
+        app.playerRight.dy = app.gameSpeed
 
       if (e.keyCode == 87 || e.which == 87) {
-        app.playerLeft.dy = -5
+        app.playerLeft.dy = -app.gameSpeed
       }
       if (e.keyCode == 83 || e.which == 83) {
-        app.playerLeft.dy = 5
+        app.playerLeft.dy = app.gameSpeed
       }
 
       if (e.keyCode == 32 || e.which == 32) {
         app.isStarted = !app.isStarted
       }
     }
+    app.keyDownHandler = function (e) {
+      if (e.keyCode == 38 || e.which == 38) {
+        this.playerRight.dy = -this.gameSpeed
+      }
+      if (e.keyCode == 40 || e.which == 40)
+        this.playerRight.dy = this.gameSpeed
+
+      if (e.keyCode == 87 || e.which == 87) {
+        this.playerLeft.dy = -this.gameSpeed
+      }
+      if (e.keyCode == 83 || e.which == 83) {
+        this.playerLeft.dy = this.gameSpeed
+      }
+
+      if (e.keyCode == 32 || e.which == 32) {
+        this.isStarted = !this.isStarted
+      }
+    }
 
     // Handle key release
-    function keyUpHandler(e) {
+    app.keyUpHandler = function (e) {
       if (e.keyCode == 38 || e.which == 38 || e.keyCode == 40 || e.which == 40) {
         app.playerRight.dy = 0
       }
@@ -228,8 +253,8 @@
     }
 
     // Listen for keydown events and call the keyDownHandler
-    document.addEventListener("keydown", keyDownHandler, false)
-    document.addEventListener("keyup", keyUpHandler, false)
+    document.addEventListener("keydown", (e) => app.keyDownHandler(e), false)
+    document.addEventListener("keyup", (e) => app.keyUpHandler(e), false)
 
     // detect window resize and scale/positon game objects accordingly.
     window.addEventListener("resize", (event) => {
