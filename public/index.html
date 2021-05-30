@@ -59,13 +59,15 @@
     };
 
     app.onUpdate = function (time) {
-      // TODO#1: Make the game cover the whole browser
+      // Make the game cover the whole browser
       this.canvas.width = this.width
       this.canvas.height = this.height
 
-      // Proceed further only if the game has started.
-      if (!this.isStarted) return
-
+      // Show a message when game is paused.
+      if (!this.isStarted) {
+        this.drawText("Click on 'space' to play!", this.centerX, 50)
+        return
+      }
       // If the playerLeft and playerRight variables are defined, proceed!
       if (this.playerLeft && this.playerRight) {
         this.handlePlayersMovement()
@@ -176,6 +178,13 @@
       this.leftBound = this.playerWidth
       this.topBound = 0
       this.bottomBound = this.height - this.playerHeight
+    }
+
+    // Add the ability to draw text to the canvas
+    app.drawText = function (msg, posX, posY, alignment = "center", font = "bold 24px Arial") {
+      this.context.font = font
+      this.context.textAlign = alignment
+      this.context.fillText(msg, posX, posY)
     }
 
     // Handle the key press event
