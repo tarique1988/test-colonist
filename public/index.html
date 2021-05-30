@@ -21,6 +21,7 @@
         y: this.centerY - this.playerHeight / 2,
         width: this.playerWidth,
         height: this.playerHeight,
+        dy: 0,
         color: '#581845'
       });
 
@@ -33,6 +34,7 @@
         y: this.centerY - this.playerHeight / 2,
         width: this.playerWidth,
         height: this.playerHeight,
+        dy: 0,
         color: '#581845',
       });
 
@@ -55,6 +57,14 @@
       // TODO#1: Make the game cover the whole browser
       this.canvas.width = this.width
       this.canvas.height = this.height
+
+      if (this.playerLeft) this.playerLeft.y += this.playerLeft.dy
+      else console.log(`Loading player 1.`);
+
+      if (this.playerRight) this.playerRight.y += this.playerRight.dy
+      else console.log(`Loading player 2`);
+
+
     };
 
     // Calculate and save values for positions, bounds, width, height, and side
@@ -79,9 +89,37 @@
       this.leftBound = this.playerWidth * 2
       this.topBound = 0
       this.bottomBound = this.height - this.playerHeight
-
-
     }
+
+    // Handle the key press event
+    function keyDownHandler(e) {
+      if (e.keyCode == 38 || e.which == 38) {
+        app.playerRight.dy = -5
+      }
+      if (e.keyCode == 40 || e.which == 40)
+        app.playerRight.dy = 5
+
+      if (e.keyCode == 87 || e.which == 87) {
+        app.playerLeft.dy = -5
+      }
+      if (e.keyCode == 83 || e.which == 83) {
+        app.playerLeft.dy = 5
+      }
+    }
+
+    // Handle key release
+    function keyUpHandler(e) {
+      if (e.keyCode == 38 || e.which == 38 || e.keyCode == 40 || e.which == 40) {
+        app.playerRight.dy = 0
+      }
+      if (e.keyCode == 87 || e.which == 87 || e.keyCode == 83 || e.which == 83) {
+        app.playerLeft.dy = 0
+      }
+    }
+    // Listen for keydown events and call the keyDownHandler
+    document.addEventListener("keydown", keyDownHandler, false)
+    document.addEventListener("keyup", keyUpHandler, false)
+
   </script>
 </body>
 
