@@ -151,6 +151,13 @@
       }
     }
 
+    app.pause = function () {
+      this.isStarted = false
+    }
+
+    app.resume = function () {
+      this.isStarted = true
+    }
     // Detect and handle collision
     app.handleBallCollision = function () {
       if ((this.ball.x + this.ballSide >= this.playerRight.x
@@ -252,39 +259,43 @@
       }
     }
 
-    // Listen for keydown events and call the keyDownHandler
-    document.addEventListener("keydown", (e) => app.keyDownHandler(e), false)
-    document.addEventListener("keyup", (e) => app.keyUpHandler(e), false)
-
-    // detect window resize and scale/positon game objects accordingly.
-    window.addEventListener("resize", (event) => {
+    app.resize = function (e) {
       // recalculate bounds, widths, heights, and positions
-      app.calculateBounds()
-
-      // adjust the x and y positions of playerRight
-      app.playerRight.x = app.rightBound
-      app.playerRight.y = app.centerY - app.playerHeight / 2
-
-      // adjust the width and height of playerLeft
-      app.playerLeft.width = app.playerWidth
-      app.playerLeft.height = app.playerHeight
+      this.calculateBounds()
 
       // adjust the x and y positions of playerLeft
-      app.playerLeft.y = app.centerY - app.playerHeight / 2
-      app.playerLeft.x = app.leftBound
+      this.playerLeft.y = this.centerY - this.playerHeight / 2
+      this.playerLeft.x = this.leftBound
+
+      // adjust the width and height of playerLeft
+      this.playerLeft.width = this.playerWidth
+      this.playerLeft.height = this.playerHeight
+
+      // adjust the x and y positions of playerRight
+      this.playerRight.x = this.rightBound
+      this.playerRight.y = this.centerY - this.playerHeight / 2
 
       // adjust the width and height of playerRight
-      app.playerRight.width = app.playerWidth
-      app.playerRight.height = app.playerHeight
+      this.playerRight.width = this.playerWidth
+      this.playerRight.height = this.playerHeight
 
       // adjust the x and y position of the ball
-      app.ball.x = app.centerX - app.ballSide / 2
-      app.ball.y = app.centerY - app.ballSide / 2
+      this.ball.x = this.centerX - this.ballSide / 2
+      this.ball.y = this.centerY - this.ballSide / 2
 
       // adjust the width and height of the ball
-      app.ball.width = app.ballSide
-      app.ball.height = app.ballSide
-    })
+      this.ball.width = this.ballSide
+      this.ball.height = this.ballSide
+    }
+
+    // Listen for keydown events and pass them to app.keyDownHandler
+    document.addEventListener("keydown", (e) => app.keyDownHandler(e), false)
+
+    // Listen for keyup events and pass them to app.keyUpHandler
+    document.addEventListener("keyup", (e) => app.keyUpHandler(e), false)
+
+    // detect window resize and pass the event to app.resize.
+    window.addEventListener("resize", (e) => app.resize(e))
 
   </script>
 </body>
