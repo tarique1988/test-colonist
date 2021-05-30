@@ -11,6 +11,9 @@
   <script type="text/javascript">
 
     app.onInit = function () {
+      // Set the game's started state to false 
+      this.isStarted = false
+
       // Calculate the initial bounds
       this.calculateBounds()
 
@@ -60,6 +63,9 @@
       this.canvas.width = this.width
       this.canvas.height = this.height
 
+      // Proceed further only if the game has started.
+      if (!this.isStarted) return
+
       // If the playerLeft and playerRight variables are defined, proceed!
       if (this.playerLeft && this.playerRight) {
         this.handlePlayersMovement()
@@ -70,6 +76,7 @@
         this.ball.x += this.ball.dx
         this.ball.y += this.ball.dy
         this.handleBallCollision()
+        this.checkForWinner()
       }
     };
 
@@ -82,6 +89,52 @@
       }
       if (playerLeftNewY > this.topBound && playerLeftNewY < this.bottomBound) {
         this.playerLeft.y = playerLeftNewY
+      }
+    }
+
+    // Check if the ball crossed either of the players, log the winner, and reset the board
+    app.checkForWinner = function () {
+      // Check if the ball crosses at least 50% of any one of the player's width
+      if (this.ball.x < this.playerLeft.x + this.playerLeft.width / 2) {
+        console.log(`Player 2 scored`)
+        app.reset()
+      } else if (this.ball.x + this.ballSide > this.playerRight.x + this.playerRight.width / 2) {
+        console.log(`Player 1 scored`)
+        app.reset()
+      }
+    }
+
+    // Reset the game
+    app.reset = function () {
+      this.resetPlayers()
+      this.resetBall()
+      this.isStarted = false
+    }
+
+    // Reset the players
+    app.resetPlayers = function () {
+      this.playerRight.x = this.rightBound
+      this.playerRight.y = this.centerY - this.playerHeight / 2
+      this.playerRight.score = 0
+
+      this.playerLeft.x = this.leftBound
+      this.playerLeft.y = this.centerY - this.playerHeight / 2
+      this.playerLeft.score = 0
+    }
+
+    // Reset the ball
+    app.resetBall = function () {
+      this.ball.x = this.centerX - this.ballSide / 2
+      this.ball.y = this.centerY - this.ballSide / 2
+      this.ball.dx = 5
+      this.ball.dy = 5
+
+      // Randomize the direction of movement for the ball
+      const random = Math.floor((Math.random() * 3) + 1)
+      if (random % 3 == 1) {
+        this.ball.dx *= -1
+      } else if (random % 3 == 0) {
+        this.ball.dy *= -1
       }
     }
 
@@ -120,7 +173,7 @@
       this.centerX = this.width / 2
       this.centerY = this.height / 2
       this.rightBound = this.width - this.playerWidth * 2
-      this.leftBound = this.playerWidth * 2
+      this.leftBound = this.playerWidth
       this.topBound = 0
       this.bottomBound = this.height - this.playerHeight
     }
@@ -138,6 +191,10 @@
       }
       if (e.keyCode == 83 || e.which == 83) {
         app.playerLeft.dy = 5
+      }
+
+      if (e.keyCode == 32 || e.which == 32) {
+        app.isStarted = !app.isStarted
       }
     }
 
