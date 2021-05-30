@@ -14,7 +14,7 @@
       // Set the game's started state to false 
       this.isStarted = false
 
-      // Calculate the initial bounds
+      // Calculate the initial bounds, widths, heights, and positions
       this.calculateBounds()
 
       // Add a player and create a reference variable
@@ -74,7 +74,7 @@
       if (this.playerLeft && this.playerRight) {
         this.showScoreboard()
         this.handlePlayersMovement()
-      } else console.log(`Loading...`);
+      } else this.drawText("Loading...", this.centerX, this.centerY)
 
       // if the ball variable is defined, proceed!
       if (this.ball) {
@@ -226,9 +226,40 @@
         app.playerLeft.dy = 0
       }
     }
+
     // Listen for keydown events and call the keyDownHandler
     document.addEventListener("keydown", keyDownHandler, false)
     document.addEventListener("keyup", keyUpHandler, false)
+
+    // detect window resize and scale/positon game objects accordingly.
+    window.addEventListener("resize", (event) => {
+      // recalculate bounds, widths, heights, and positions
+      app.calculateBounds()
+
+      // adjust the x and y positions of playerRight
+      app.playerRight.x = app.rightBound
+      app.playerRight.y = app.centerY - app.playerHeight / 2
+
+      // adjust the width and height of playerLeft
+      app.playerLeft.width = app.playerWidth
+      app.playerLeft.height = app.playerHeight
+
+      // adjust the x and y positions of playerLeft
+      app.playerLeft.y = app.centerY - app.playerHeight / 2
+      app.playerLeft.x = app.leftBound
+
+      // adjust the width and height of playerRight
+      app.playerRight.width = app.playerWidth
+      app.playerRight.height = app.playerHeight
+
+      // adjust the x and y position of the ball
+      app.ball.x = app.centerX - app.ballSide / 2
+      app.ball.y = app.centerY - app.ballSide / 2
+
+      // adjust the width and height of the ball
+      app.ball.width = app.ballSide
+      app.ball.height = app.ballSide
+    })
 
   </script>
 </body>
