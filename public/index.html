@@ -2,49 +2,87 @@
 <html>
 
 <head>
-	<title>Ping Pong Game</title>
+  <title>Ping Pong Game | TAM</title>
 </head>
 
 <body style="padding: 0; margin: 0; height: 100vh;">
-	<canvas id="canvas" width="800" height="400"></canvas>
-	<script type="text/javascript" src="js/app.js"></script>
-	<script type="text/javascript">
+  <canvas id="canvas" width="800" height="400"></canvas>
+  <script type="text/javascript" src="js/app.js"></script>
+  <script type="text/javascript">
 
-		app.onInit = function () {
-			this.calculateBounds()
-		};
+    app.onInit = function () {
+      // Calculate the initial bounds
+      this.calculateBounds()
 
-		app.onUpdate = function (time) {
-			// TODO#1: Make the game cover the whole browser
-			this.canvas.width = this.width
-			this.canvas.height = this.height
-		};
+      // Add a player and create a reference variable
+      this.nodes.push({
+        id: 'player-left',
+        x: this.leftBound,
+        y: this.centerY - this.playerHeight / 2,
+        width: this.playerWidth,
+        height: this.playerHeight,
+        color: '#581845'
+      });
 
-		// Calculate and save values for positions, bounds, width, height, and side
-		app.calculateBounds = function () {
-			// Save the existing width and height
-			this.previousWidth = this.width
-			this.previousHeight = this.height
+      this.playerLeft = this.getNode("player-left")
 
-			// update the width and height to match the window
-			this.width = window.innerWidth
-			this.height = window.innerHeight
+      // Add a player and create a reference variable
+      this.nodes.push({
+        id: 'player-right',
+        x: this.rightBound,
+        y: this.centerY - this.playerHeight / 2,
+        width: this.playerWidth,
+        height: this.playerHeight,
+        color: '#581845',
+      });
 
-			// calculate the position for center and boundary
-			this.centerX = this.width / 2
-			this.centerY = this.height / 2
-			this.rightBound = this.width - this.playerWidth * 2
-			this.leftBound = this.playerWidth * 2
-			this.topBound = 0
-			this.bottomBound = this.height - this.playerHeight
+      this.playerRight = this.getNode("player-right")
 
-			// Calculate the measurements of player and ball
-			this.playerWidth = this.width / 80
-			this.playerHeight = this.height / 5
-			this.ballSide = this.width / 100
+      // Add a ball and create a reference variable
+      this.nodes.push({
+        id: "ball",
+        x: this.centerX - this.ballSide / 2,
+        y: this.centerY - this.ballSide / 2,
+        width: this.ballSide,
+        height: this.ballSide,
+        color: '#FF5733'
+      })
 
-		}
-	</script>
+      this.ball = this.getNode("ball")
+    };
+
+    app.onUpdate = function (time) {
+      // TODO#1: Make the game cover the whole browser
+      this.canvas.width = this.width
+      this.canvas.height = this.height
+    };
+
+    // Calculate and save values for positions, bounds, width, height, and side
+    app.calculateBounds = function () {
+      // Save the existing width and height
+      this.previousWidth = this.width
+      this.previousHeight = this.height
+
+      // update the width and height to match the window
+      this.width = window.innerWidth
+      this.height = window.innerHeight
+
+      // Calculate the measurements of player and ball
+      this.playerWidth = this.width / 80
+      this.playerHeight = this.height / 5
+      this.ballSide = this.width / 100
+
+      // calculate the position for center and boundary
+      this.centerX = this.width / 2
+      this.centerY = this.height / 2
+      this.rightBound = this.width - this.playerWidth * 2
+      this.leftBound = this.playerWidth * 2
+      this.topBound = 0
+      this.bottomBound = this.height - this.playerHeight
+
+
+    }
+  </script>
 </body>
 
 </html>
