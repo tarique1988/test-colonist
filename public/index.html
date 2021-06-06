@@ -1,46 +1,305 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-	<title>Ping Pong Game</title>
+  <title>Ping Pong Game | TAM</title>
 </head>
-<body>
-	<canvas id="canvas" width="800" height="400"></canvas>
-	<script type="text/javascript" src="js/app.js"></script>
-	<script type="text/javascript">
-		//Sample functions, remove these functions and design ping-pong game with onInit and onUpdate.
 
-		app.onInit = function(){
-			this.nodes.push({
-				id : 'red-box',
-				x  : 100,
-				y  : 0,
-				width  : 100,
-				height : 100,
-				color  : 'red',
-				direction : 0
-			});
+<body style="padding: 0; margin: 0; height: 100vh;">
+  <canvas id="canvas" width="800" height="400"></canvas>
+  <script type="text/javascript" src="js/app.js"></script>
+  <script type="text/javascript">
 
-			this.nodes.push({
-				id : 'black-box',
-				x  : 50,
-				y  : 0,
-				width  : 150,
-				height : 150,
-				color  : 'black'
-			});
-		};
+    app.onInit = function () {
+      // Set the game's started state to false 
+      this.isStarted = false
+      this.gameSpeed = 5
 
-		app.onUpdate = function(time){
-			this.getNode('black-box').y++;
+      // Calculate the initial bounds, widths, heights, and positions
+      this.calculateBounds()
 
-			if(Math.cos(this.timestamp / 100) > 0){
-				this.getNode('red-box').direction = -1;
-			}else{
-				this.getNode('red-box').direction = 1;
-			}
+      // Add a player and create a reference variable
+      this.nodes.push({
+        id: 'player-left',
+        x: this.leftBound,
+        y: this.centerY - this.playerHeight / 2,
+        width: this.playerWidth,
+        height: this.playerHeight,
+        dy: 0,
+        color: '#581845',
+        score: 0
+      });
 
-			this.getNode('red-box').x+=this.getNode('red-box').direction;
-		};
-	</script>
+      this.playerLeft = this.getNode("player-left")
+
+      // Add a player and create a reference variable
+      this.nodes.push({
+        id: 'player-right',
+        x: this.rightBound,
+        y: this.centerY - this.playerHeight / 2,
+        width: this.playerWidth,
+        height: this.playerHeight,
+        dy: 0,
+        color: '#581845',
+        score: 0
+      });
+
+      this.playerRight = this.getNode("player-right")
+
+      // Add a ball and create a reference variable
+      this.nodes.push({
+        id: "ball",
+        x: this.centerX - this.ballSide / 2,
+        y: this.centerY - this.ballSide / 2,
+        width: this.ballSide,
+        height: this.ballSide,
+        dx: this.gameSpeed,
+        dy: this.gameSpeed,
+        color: '#FF5733'
+      })
+
+      this.ball = this.getNode("ball")
+    };
+
+    app.onUpdate = function (time) {
+      // Make the game cover the whole browser
+      this.canvas.width = this.width
+      this.canvas.height = this.height
+
+      // Show a message when game is paused.
+      if (!this.isStarted) {
+        this.drawText("Click on 'space' to play!", this.centerX, 50)
+        return
+      }
+      // If the playerLeft and playerRight variables are defined, proceed!
+      if (this.playerLeft && this.playerRight) {
+        this.showScoreboard()
+        this.handlePlayersMovement()
+      } else this.drawText("Loading...", this.centerX, this.centerY)
+
+      // if the ball variable is defined, proceed!
+      if (this.ball) {
+        this.ball.x += this.ball.dx
+        this.ball.y += this.ball.dy
+        this.handleBallCollision()
+        this.checkForWinner()
+      }
+    };
+
+    app.showScoreboard = function () {
+      this.drawText(`PlayerLeft: ${this.playerLeft.score}`, this.leftBound, 50, "start")
+      this.drawText(`PlayerRight: ${this.playerRight.score}`, this.rightBound, 50, "end")
+    }
+
+    // Make sure that players only move within the defined boundaries
+    app.handlePlayersMovement = function () {
+      const playerRightNewY = this.playerRight.y + this.playerRight.dy
+      const playerLeftNewY = this.playerLeft.y + this.playerLeft.dy
+      if (playerRightNewY > this.topBound && playerRightNewY < this.bottomBound) {
+        this.playerRight.y = playerRightNewY;
+      }
+      if (playerLeftNewY > this.topBound && playerLeftNewY < this.bottomBound) {
+        this.playerLeft.y = playerLeftNewY
+      }
+    }
+
+    // Check if the ball crossed either of the players, log the winner, and reset the board
+    app.checkForWinner = function () {
+      // Check if the ball crosses at least 50% of any one of the player's width
+      if (this.ball.x < this.playerLeft.x + this.playerLeft.width / 2) {
+        console.log(`Player 2 scored`)
+        this.playerRight.score += 10
+        app.resetBall()
+      } else if (this.ball.x + this.ballSide > this.playerRight.x + this.playerRight.width / 2) {
+        console.log(`Player 1 scored`)
+        this.playerLeft.score += 10
+        app.resetBall()
+      }
+    }
+
+    // Reset the game
+    app.reset = function () {
+      this.resetPlayers()
+      this.resetBall()
+    }
+
+    // Reset the players
+    app.resetPlayers = function () {
+      this.playerRight.x = this.rightBound
+      this.playerRight.y = this.centerY - this.playerHeight / 2
+      this.playerRight.dy = this.gameSpeed
+      this.playerRight.score = 0
+
+      this.playerLeft.x = this.leftBound
+      this.playerLeft.y = this.centerY - this.playerHeight / 2
+      this.playerLeft.dy = this.gameSpeed
+      this.playerLeft.score = 0
+    }
+
+    // Reset the ball
+    app.resetBall = function () {
+      this.gameSpeed = 5
+      this.ball.x = this.centerX - this.ballSide / 2
+      this.ball.y = this.centerY - this.ballSide / 2
+      this.ball.dx = this.gameSpeed
+      this.ball.dy = this.gameSpeed
+
+      // Randomize the direction of movement for the ball
+      const random = Math.floor((Math.random() * 3) + 1)
+      if (random % 3 == 1) {
+        this.ball.dx *= -1
+      } else if (random % 3 == 0) {
+        this.ball.dy *= -1
+      }
+    }
+
+    app.pause = function () {
+      this.isStarted = false
+    }
+
+    app.resume = function () {
+      this.isStarted = true
+    }
+    // Detect and handle collision
+    app.handleBallCollision = function () {
+      if ((this.ball.x + this.ballSide >= this.playerRight.x
+        && this.ball.x + this.ballSide <= this.playerRight.x + this.playerWidth
+        && this.ball.y + this.ballSide >= this.playerRight.y
+        && this.ball.y <= this.playerRight.y + this.playerHeight) ||
+        (this.ball.x <= this.playerLeft.x + this.playerWidth
+          && this.ball.x >= this.playerLeft.x
+          && this.ball.y + this.ballSide >= this.playerLeft.y
+          && this.ball.y <= this.playerLeft.y + this.playerHeight)) {
+        this.gameSpeed *= 1.05 // increase the speed by 5% each time
+        if (this.ball.dx < 0) this.ball.dx = this.gameSpeed
+        else this.ball.dx = -this.gameSpeed
+      }
+
+      if (this.ball.y + this.ballSide >= this.height || this.ball.y <= 0) {
+        if (this.ball.dy < 0) this.ball.dy = this.gameSpeed
+        else this.ball.dy = -this.gameSpeed
+      }
+    }
+
+    // Calculate and save values for positions, bounds, width, height, and side
+    app.calculateBounds = function () {
+      // Save the existing width and height
+      this.previousWidth = this.width
+      this.previousHeight = this.height
+
+      // update the width and height to match the window
+      this.width = window.innerWidth
+      this.height = window.innerHeight
+
+      // Calculate the measurements of player and ball
+      this.playerWidth = this.width / 80
+      this.playerHeight = this.height / 5
+      this.ballSide = this.width / 100
+
+      // calculate the position for center and boundary
+      this.centerX = this.width / 2
+      this.centerY = this.height / 2
+      this.rightBound = this.width - this.playerWidth * 2
+      this.leftBound = this.playerWidth
+      this.topBound = 0
+      this.bottomBound = this.height - this.playerHeight
+    }
+
+    // Add the ability to draw text to the canvas
+    app.drawText = function (msg, posX, posY, alignment = "center", font = "bold 24px Arial") {
+      this.context.font = font
+      this.context.textAlign = alignment
+      this.context.fillStyle = "#900C3F"
+      this.context.fillText(msg, posX, posY)
+    }
+
+    // Handle the key press event
+    function keyDownHandler(e) {
+      if (e.keyCode == 38 || e.which == 38) {
+        app.playerRight.dy = -app.gameSpeed
+      }
+      if (e.keyCode == 40 || e.which == 40)
+        app.playerRight.dy = app.gameSpeed
+
+      if (e.keyCode == 87 || e.which == 87) {
+        app.playerLeft.dy = -app.gameSpeed
+      }
+      if (e.keyCode == 83 || e.which == 83) {
+        app.playerLeft.dy = app.gameSpeed
+      }
+
+      if (e.keyCode == 32 || e.which == 32) {
+        app.isStarted = !app.isStarted
+      }
+    }
+    app.keyDownHandler = function (e) {
+      if (e.keyCode == 38 || e.which == 38) {
+        this.playerRight.dy = -this.gameSpeed
+      }
+      if (e.keyCode == 40 || e.which == 40)
+        this.playerRight.dy = this.gameSpeed
+
+      if (e.keyCode == 87 || e.which == 87) {
+        this.playerLeft.dy = -this.gameSpeed
+      }
+      if (e.keyCode == 83 || e.which == 83) {
+        this.playerLeft.dy = this.gameSpeed
+      }
+
+      if (e.keyCode == 32 || e.which == 32) {
+        this.isStarted = !this.isStarted
+      }
+    }
+
+    // Handle key release
+    app.keyUpHandler = function (e) {
+      if (e.keyCode == 38 || e.which == 38 || e.keyCode == 40 || e.which == 40) {
+        app.playerRight.dy = 0
+      }
+      if (e.keyCode == 87 || e.which == 87 || e.keyCode == 83 || e.which == 83) {
+        app.playerLeft.dy = 0
+      }
+    }
+
+    app.resize = function (e) {
+      // recalculate bounds, widths, heights, and positions
+      this.calculateBounds()
+
+      // adjust the x and y positions of playerLeft
+      this.playerLeft.y = this.centerY - this.playerHeight / 2
+      this.playerLeft.x = this.leftBound
+
+      // adjust the width and height of playerLeft
+      this.playerLeft.width = this.playerWidth
+      this.playerLeft.height = this.playerHeight
+
+      // adjust the x and y positions of playerRight
+      this.playerRight.x = this.rightBound
+      this.playerRight.y = this.centerY - this.playerHeight / 2
+
+      // adjust the width and height of playerRight
+      this.playerRight.width = this.playerWidth
+      this.playerRight.height = this.playerHeight
+
+      // adjust the x and y position of the ball
+      this.ball.x = this.centerX - this.ballSide / 2
+      this.ball.y = this.centerY - this.ballSide / 2
+
+      // adjust the width and height of the ball
+      this.ball.width = this.ballSide
+      this.ball.height = this.ballSide
+    }
+
+    // Listen for keydown events and pass them to app.keyDownHandler
+    document.addEventListener("keydown", (e) => app.keyDownHandler(e), false)
+
+    // Listen for keyup events and pass them to app.keyUpHandler
+    document.addEventListener("keyup", (e) => app.keyUpHandler(e), false)
+
+    // detect window resize and pass the event to app.resize.
+    window.addEventListener("resize", (e) => app.resize(e))
+
+  </script>
 </body>
+
 </html>
